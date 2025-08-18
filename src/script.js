@@ -98,6 +98,12 @@ const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true;
+// using damping so that it do not stops suddenly while rotating
+controls.maxDistance = 200;
+controls.minDistance = 20;
+
 window.addEventListener("resize", () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
@@ -105,6 +111,7 @@ window.addEventListener("resize", () => {
 });
 
 const renderloop = () => {
+  controls.update();
   renderer.render(scene, camera);
   window.requestAnimationFrame(renderloop);
 };
