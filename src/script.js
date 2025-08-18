@@ -6,6 +6,31 @@ const pane = new Pane();
 
 const scene = new THREE.Scene();
 
+const textureLoader = new THREE.TextureLoader();
+const cubeTextureLoader = new THREE.CubeTextureLoader();
+cubeTextureLoader.setPath('/textures/cubeMap/');
+
+
+const sunTexture = textureLoader.load('/textures/sunmap.jpg')
+const mercuryTexture = textureLoader.load('/textures/mercurymap.jpg')
+const venusTexture = textureLoader.load('/textures/venusmap.jpg')
+const earthTexture = textureLoader.load('/textures/8081_earthmap10k.jpg')
+const marsTexture = textureLoader.load('/textures/mars_1k_normal.jpg')
+const jupiterTexture = textureLoader.load('/textures/jupitermap.jpg');
+const uranusTexture = textureLoader.load('/textures/uranusmap.jpg')
+const neptuneTexture = textureLoader.load('/textures/neptunemap.jpg')
+const moonTexture = textureLoader.load('/textures/moonmap4k.jpg')
+
+const backgroundCubemap = cubeTextureLoader.load([
+  'px.png',
+  'nx.png',
+  'py.png',
+  'ny.png',
+  'pz.png',
+  'nz.png'
+]);
+
+scene.background = backgroundCubemap;
 
 const sphereGeometry = new THREE.SphereGeometry(1,32,32);
 const sunMaterial = new THREE.MeshBasicMaterial(
