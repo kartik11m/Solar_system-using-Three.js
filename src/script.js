@@ -11,7 +11,7 @@ const cubeTextureLoader = new THREE.CubeTextureLoader();
 cubeTextureLoader.setPath('/textures/cubeMap/');
 
 
-const sunTexture = textureLoader.load('/textures/sunmap.jpg')
+const sunTexture = textureLoader.load('/textures/2k_sun.jpg')
 const mercuryTexture = textureLoader.load('/textures/mercurymap.jpg')
 const venusTexture = textureLoader.load('/textures/venusmap.jpg')
 const earthTexture = textureLoader.load('/textures/8081_earthmap10k.jpg')
@@ -32,10 +32,51 @@ const backgroundCubemap = cubeTextureLoader.load([
 
 scene.background = backgroundCubemap;
 
+const mercuryMaterial = new THREE.MeshStandardMaterial(
+  {
+    map: mercuryTexture,
+  }
+)
+const venusMaterial = new THREE.MeshStandardMaterial(
+  {
+    map: venusTexture,
+  }
+)
+const earthMaterial = new THREE.MeshStandardMaterial(
+  {
+    map: earthTexture,
+  }
+)
+const marsMaterial = new THREE.MeshStandardMaterial(
+  {
+    map: marsTexture,
+  }
+)
+const jupiterMaterial = new THREE.MeshStandardMaterial(
+  {
+    map: jupiterTexture,
+  }
+)
+const uranusMaterial = new THREE.MeshStandardMaterial(
+  {
+    map: uranusTexture,
+  }
+)
+const neptuneMaterial = new THREE.MeshStandardMaterial(
+  {
+    map: neptuneTexture,
+  }
+)
+const moonMaterial = new THREE.MeshStandardMaterial(
+  {
+    map: moonTexture,
+  }
+)
+
 const sphereGeometry = new THREE.SphereGeometry(1,32,32);
 const sunMaterial = new THREE.MeshBasicMaterial(
   {
-    color: "orange"
+    map: sunTexture,
   }
 );
 
