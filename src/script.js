@@ -15,8 +15,9 @@ const sunTexture = textureLoader.load('/textures/2k_sun.jpg')
 const mercuryTexture = textureLoader.load('/textures/mercurymap.jpg')
 const venusTexture = textureLoader.load('/textures/venusmap.jpg')
 const earthTexture = textureLoader.load('/textures/8081_earthmap10k.jpg')
-const marsTexture = textureLoader.load('/textures/mars_1k_normal.jpg')
+const marsTexture = textureLoader.load('/textures/2k_mars.jpg')
 const jupiterTexture = textureLoader.load('/textures/jupitermap.jpg');
+const saturnTexture = textureLoader.load('/textures/saturnmap.jpg')
 const uranusTexture = textureLoader.load('/textures/uranusmap.jpg')
 const neptuneTexture = textureLoader.load('/textures/neptunemap.jpg')
 const moonTexture = textureLoader.load('/textures/moonmap4k.jpg')
@@ -57,6 +58,11 @@ const jupiterMaterial = new THREE.MeshStandardMaterial(
     map: jupiterTexture,
   }
 )
+const saturnMaterial = new THREE.MeshStandardMaterial(
+  {
+    map: saturnTexture,
+  }
+)
 const uranusMaterial = new THREE.MeshStandardMaterial(
   {
     map: uranusTexture,
@@ -83,6 +89,103 @@ const sunMaterial = new THREE.MeshBasicMaterial(
 const sun = new THREE.Mesh(sphereGeometry,sunMaterial);
 sun.scale.setScalar(5);
 scene.add(sun);
+
+const planets = [
+  {
+    name: 'Mercury',
+    radius: 0.4,
+    distance: 10,
+    speed: 0.04,
+    material: mercuryMaterial,
+    tilt: 0.034,
+    moons: [],
+  },
+  {
+    name: 'Venus',
+    radius: 0.6,
+    distance: 15,
+    speed: 0.035,
+    material: venusMaterial,
+    tilt: 177.4,
+    moons: [],
+  },
+  {
+    name: 'Earth',
+    radius: 0.7,
+    distance: 20,
+    speed: 0.03,
+    material: earthMaterial,
+    tilt: 23.44,
+    moons: [
+      {
+        name: 'Moon',
+        radius: 0.2,
+        distance: 2.5,
+        speed: 0.08,
+      }
+    ]
+  },
+  {
+    name: 'Mars',
+    radius: 0.5,
+    distance: 25,
+    speed: 0.025,
+    material: marsMaterial,
+    tilt: 25.19,
+    moons: [
+      {
+        name: 'Phobos',
+        radius: 0.1,
+        distance: 1.5,
+        speed: 0.1,
+      },
+      {
+        name: 'Deimos',
+        radius: 0.1,
+        distance: 2.2,
+        speed: 0.07,
+        color: 0xffffff,
+      }
+    ]
+  },
+  {
+    name: 'Jupiter',
+    radius: 1.2,
+    distance: 30,
+    speed: 0.02,
+    material: jupiterMaterial,
+    tilt: 3.13,
+    moons: [],
+  },
+  {
+    name: 'Saturn',
+    radius: 1.1,
+    distance: 35,
+    speed: 0.018,
+    material: saturnMaterial,
+    tilt: 26.73,
+    moons: [],
+  },
+  {
+    name: 'Uranus',
+    radius: 0.9,
+    distance: 40,
+    speed: 0.015,
+    material: uranusMaterial,
+    tilt: 97.77,
+    moons: [],
+  },
+  {
+    name: 'Neptune',
+    radius: 0.9,
+    distance: 45,
+    speed: 0.012,
+    material: neptuneMaterial,
+    tilt: 28.32,
+    moons: [],
+  },
+];
+
 
 const camera = new THREE.PerspectiveCamera(
   35,
