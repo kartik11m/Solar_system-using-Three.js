@@ -187,6 +187,51 @@ const planets = [
 ];
 
 
+const createPlanet = (planet) =>{
+  // create a mesh
+  const planetMesh = new THREE.Mesh(
+  sphereGeometry,
+  planet.material,
+)
+// planetMesh.rotation.z = -planet.tilt*Math.PI / 180;
+// set the scale
+planetMesh.scale.setScalar(planet.radius);
+planetMesh.position.x = planet.distance;
+
+return planetMesh;
+}
+const createMoon = (moon) =>{
+  const moonMesh = new THREE.Mesh(
+    sphereGeometry,
+    moonMaterial
+  )
+  moonMesh.scale.setScalar(moon.radius);
+  moonMesh.position.x = moon.distance;
+
+  return moonMesh;
+}
+
+const planetMeshes = planets.map((planet) => {
+
+const planetMesh = createPlanet(planet);
+// add it to our scene
+scene.add(planetMesh);
+
+// loop through each moon and create the moon
+planet.moons.forEach((moon) => {
+
+  const moonMesh = createMoon(moon);
+  planetMesh.add(moonMesh);
+
+})
+  return planetMesh;
+}); 
+
+const sunLight = new THREE.DirectionalLight(0xffffff, 2);
+sunLight.position.set(-5, 0, 0);
+sunLight.castShadow = true;
+scene.add(sunLight);
+
 const camera = new THREE.PerspectiveCamera(
   35,
   window.innerWidth / window.innerHeight,
