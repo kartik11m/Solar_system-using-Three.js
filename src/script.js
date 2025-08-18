@@ -95,7 +95,7 @@ const planets = [
     name: 'Mercury',
     radius: 0.4,
     distance: 10,
-    speed: 0.04,
+    speed: 0.01,
     material: mercuryMaterial,
     tilt: 0.034,
     moons: [],
@@ -104,7 +104,7 @@ const planets = [
     name: 'Venus',
     radius: 0.6,
     distance: 15,
-    speed: 0.035,
+    speed: 0.007,
     material: venusMaterial,
     tilt: 177.4,
     moons: [],
@@ -113,7 +113,7 @@ const planets = [
     name: 'Earth',
     radius: 0.7,
     distance: 20,
-    speed: 0.03,
+    speed: 0.005,
     material: earthMaterial,
     tilt: 23.44,
     moons: [
@@ -121,7 +121,7 @@ const planets = [
         name: 'Moon',
         radius: 0.2,
         distance: 2.5,
-        speed: 0.08,
+        speed: 0.015,
       }
     ]
   },
@@ -129,7 +129,7 @@ const planets = [
     name: 'Mars',
     radius: 0.5,
     distance: 25,
-    speed: 0.025,
+    speed: 0.0045,
     material: marsMaterial,
     tilt: 25.19,
     moons: [
@@ -137,13 +137,13 @@ const planets = [
         name: 'Phobos',
         radius: 0.1,
         distance: 1.5,
-        speed: 0.1,
+        speed: 0.02,
       },
       {
         name: 'Deimos',
         radius: 0.1,
         distance: 2.2,
-        speed: 0.07,
+        speed: 0.015,
         color: 0xffffff,
       }
     ]
@@ -152,7 +152,7 @@ const planets = [
     name: 'Jupiter',
     radius: 1.2,
     distance: 30,
-    speed: 0.02,
+    speed: 0.012,
     material: jupiterMaterial,
     tilt: 3.13,
     moons: [],
@@ -161,7 +161,7 @@ const planets = [
     name: 'Saturn',
     radius: 1.1,
     distance: 35,
-    speed: 0.018,
+    speed: 0.010,
     material: saturnMaterial,
     tilt: 26.73,
     moons: [],
@@ -170,7 +170,7 @@ const planets = [
     name: 'Uranus',
     radius: 0.9,
     distance: 40,
-    speed: 0.015,
+    speed: 0.011,
     material: uranusMaterial,
     tilt: 97.77,
     moons: [],
@@ -227,10 +227,11 @@ planet.moons.forEach((moon) => {
   return planetMesh;
 }); 
 
-const sunLight = new THREE.DirectionalLight(0xffffff, 2);
-sunLight.position.set(-5, 0, 0);
-sunLight.castShadow = true;
-scene.add(sunLight);
+const pointLight = new THREE.PointLight(
+  0xffffff,400
+)
+
+scene.add(pointLight); 
 
 const camera = new THREE.PerspectiveCamera(
   35,
@@ -258,7 +259,22 @@ window.addEventListener("resize", () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
+const clock = new THREE.Clock();
+
 const renderloop = () => {
+  const elapsedTime = clock.getElapsedTime();
+
+  planetMeshes.forEach((planet , planetIndex) => {
+    planet.rotation.y += planets[planetIndex].speed;
+    planet.position.x = Math.sin(planet.rotation.y) * planets[planetIndex].distance;
+    planet.position.z = Math.cos(planet.rotation.y) * planets[planetIndex].distance;  
+
+    planet.children.forEach((moon , moonIndex) =>{
+      moon.rotation.y += planets[planetIndex].moons[moonIndex].speed;
+      moon.position.x = Math.sin(moon.rotation.y) * planets[planetIndex].moons[moonIndex].distance;
+      moon.position.z = Math.cos(moon.rotation.y) * planets[planetIndex].moons[moonIndex].distance;
+    })
+  })
   controls.update();
   renderer.render(scene, camera);
   window.requestAnimationFrame(renderloop);
