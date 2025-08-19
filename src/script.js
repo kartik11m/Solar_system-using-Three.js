@@ -43,9 +43,15 @@ const venusMaterial = new THREE.MeshStandardMaterial(
     map: venusTexture,
   }
 )
-const earthMaterial = new THREE.MeshStandardMaterial(
+const earthMaterial = new THREE.MeshPhongMaterial(
   {
-    map: earthTexture,
+        map: earthTexture,
+        bumpMap: textureLoader.load("./textures/8081_earthbump10k.jpg"),
+        bumpScale: 0.3, 
+        specularMap: textureLoader.load("./textures/8081_earthspec10k.jpg"), // reflectivity
+        specular: new THREE.Color('grey'), // tweak for intensity
+        shininess: 20, // lower = softer highlights, higher = sharper
+    
   }
 )
 const marsMaterial = new THREE.MeshStandardMaterial(
@@ -123,7 +129,13 @@ const planets = [
         distance: 2.5,
         speed: 0.015,
       }
-    ]
+    ],
+    layers:{
+      lightsMap:"./textures/8081_earthlights10k.jpg",
+      cloudsMap: "./textures/8081_earthhiresclouds4K.jpg",
+      cloudsAlpha: "./textures/earthcloudmaptrans.jpg"
+    },
+
   },
   {
     name: 'Mars',
@@ -137,7 +149,7 @@ const planets = [
         name: 'Phobos',
         radius: 0.1,
         distance: 1.5,
-        speed: 0.02,
+        speed: 0.03,
       },
       {
         name: 'Deimos',
@@ -193,10 +205,33 @@ const createPlanet = (planet) =>{
   sphereGeometry,
   planet.material,
 )
-// planetMesh.rotation.z = -planet.tilt*Math.PI / 180;
+if (planet.name === 'Earth' && planet.layers) {
+  const lightsMat = new THREE.MeshBasicMaterial({
+    map: textureLoader.load(planet.layers.lightsMap),
+    blending: THREE.AdditiveBlending,
+  });
+  const lightsMesh = new THREE.Mesh(sphereGeometry, lightsMat);
+  lightsMesh.name = 'EarthLights';
+  lightsMesh.scale.setScalar(1.005);
+  planetMesh.add(lightsMesh);
+
+  const cloudsMat = new THREE.MeshStandardMaterial({
+    map: textureLoader.load(planet.layers.cloudsMap),
+    transparent: true,
+    opacity: 0.8,
+    blending: THREE.AdditiveBlending,
+    alphaMap: textureLoader.load(planet.layers.cloudsAlpha),
+  });
+  const cloudsMesh = new THREE.Mesh(sphereGeometry, cloudsMat);
+  cloudsMesh.name = 'EarthClouds';
+  cloudsMesh.scale.setScalar(1.01);
+  planetMesh.add(cloudsMesh);
+}
+
 // set the scale
 planetMesh.scale.setScalar(planet.radius);
 planetMesh.position.x = planet.distance;
+// planetMesh.rotation.z = -planet.tilt*Math.PI / 180;
 
 return planetMesh;
 }
@@ -207,6 +242,7 @@ const createMoon = (moon) =>{
   )
   moonMesh.scale.setScalar(moon.radius);
   moonMesh.position.x = moon.distance;
+  moonMesh.name = moon.name;
 
   return moonMesh;
 }
@@ -225,6 +261,7 @@ planet.moons.forEach((moon) => {
 
 })
   return planetMesh;
+// add the moon the planet
 }); 
 
 const pointLight = new THREE.PointLight(
@@ -250,8 +287,8 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
 // using damping so that it do not stops suddenly while rotating
-controls.maxDistance = 200;
-controls.minDistance = 20;
+// controls.maxDistance = 200;
+// controls.minDistance = 20;
 
 window.addEventListener("resize", () => {
   camera.aspect = window.innerWidth / window.innerHeight;
@@ -264,17 +301,32 @@ const clock = new THREE.Clock();
 const renderloop = () => {
   const elapsedTime = clock.getElapsedTime();
 
+// console.log(planetMeshes);
   planetMeshes.forEach((planet , planetIndex) => {
-    planet.rotation.y += planets[planetIndex].speed;
-    planet.position.x = Math.sin(planet.rotation.y) * planets[planetIndex].distance;
-    planet.position.z = Math.cos(planet.rotation.y) * planets[planetIndex].distance;  
+    const angle = elapsedTime * planets[planetIndex].speed*10;
+    const distance = planets[planetIndex].distance;
+    planet.position.x = Math.sin(angle) * distance;
+    planet.position.z = Math.cos(angle) * distance;
 
-    planet.children.forEach((moon , moonIndex) =>{
-      moon.rotation.y += planets[planetIndex].moons[moonIndex].speed;
-      moon.position.x = Math.sin(moon.rotation.y) * planets[planetIndex].moons[moonIndex].distance;
-      moon.position.z = Math.cos(moon.rotation.y) * planets[planetIndex].moons[moonIndex].distance;
+    planet.rotation.y += planets[planetIndex].speed;
+
+    if(planets[planetIndex].name === 'Earth'){
+      const cloudsMesh = planet.getObjectByName('EarthClouds');
+
+      // if (lightsMesh) lightsMesh.rotation.y += 0.002;
+      if (cloudsMesh) cloudsMesh.rotation.y += 0.0023;
+    }
+    planets[planetIndex].moons.forEach((moonData , moonIndex) =>{
+     const moonMesh = planet.children.find(child => child.name === moonData.name);
+      if (moonMesh) {
+        const moonAngle = elapsedTime * moonData.speed;
+        const mx = Math.sin(moonAngle) * moonData.distance;
+        const mz = Math.cos(moonAngle) * moonData.distance;
+        moonMesh.position.set(mx,0,mz);
+      }
     })
   })
+
   controls.update();
   renderer.render(scene, camera);
   window.requestAnimationFrame(renderloop);
