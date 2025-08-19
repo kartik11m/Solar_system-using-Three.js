@@ -95,6 +95,25 @@ const moonMaterial = new THREE.MeshStandardMaterial(
 )
 
 const sphereGeometry = new THREE.SphereGeometry(1,32,32);
+const torusGeometry = new THREE.TorusGeometry(1.75 , 0.4 ,2 ,100);
+
+const ringTexture = textureLoader.load("./textures/saturnringpattern.gif");
+ringTexture.wrapS = THREE.RepeatWrapping;
+ringTexture.wrapT = THREE.RepeatWrapping;
+ringTexture.rotation = Math.PI / 2; // Rotate 90 degrees
+ringTexture.center.set(0.5, 0.5);   // Rotate around center
+
+const saturnRingMaterial = new THREE.MeshStandardMaterial(
+  {
+    map: ringTexture,
+  }
+);
+const saturnRing = new THREE.Mesh(torusGeometry,saturnRingMaterial);
+// saturnRing.position.y = 10;
+saturnRing.rotation.x = -1.5;
+
+scene.add(saturnRing);
+
 const sunMaterial = new THREE.MeshBasicMaterial(
   {
     map: sunTexture,
@@ -327,6 +346,10 @@ if (planet.name === 'Earth' && planet.layers) {
   planetMesh.add(glowMesh)
 }
 
+if (planet.name === "Saturn"){
+  planetMesh.add(saturnRing);
+}
+
 // set the scale
 planetMesh.scale.setScalar(planet.radius);
 planetMesh.position.x = planet.distance;
@@ -368,6 +391,11 @@ const pointLight = new THREE.PointLight(
 )
 
 scene.add(pointLight); 
+
+const ambientLight = new THREE.AmbientLight(
+  0xffffff , .1
+)
+scene.add(ambientLight);
 
 const camera = new THREE.PerspectiveCamera(
   35,
@@ -425,6 +453,7 @@ const renderloop = () => {
       }
     })
   })
+  saturnRing.rotation.z += 2;
   animateSolarWind();
   controls.update();
   renderer.render(scene, camera);
