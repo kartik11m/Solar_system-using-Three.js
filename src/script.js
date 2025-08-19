@@ -16,7 +16,7 @@ const sunTexture = textureLoader.load('/textures/2k_sun.jpg')
 const mercuryTexture = textureLoader.load('/textures/mercurymap.jpg')
 const venusTexture = textureLoader.load('/textures/venusmap.jpg')
 const earthTexture = textureLoader.load('/textures/8081_earthmap10k.jpg')
-const marsTexture = textureLoader.load('/textures/2k_mars.jpg')
+const marsTexture = textureLoader.load('/textures/mars_1k_color.jpg')
 const jupiterTexture = textureLoader.load('/textures/jupitermap.jpg');
 const saturnTexture = textureLoader.load('/textures/saturnmap.jpg')
 const uranusTexture = textureLoader.load('/textures/uranusmap.jpg')
@@ -37,11 +37,15 @@ scene.background = backgroundCubemap;
 const mercuryMaterial = new THREE.MeshStandardMaterial(
   {
     map: mercuryTexture,
+    bumpMap: textureLoader.load("./textures/mercurybump.jpg"),
+    bumpScale: 0.5,
   }
 )
 const venusMaterial = new THREE.MeshStandardMaterial(
   {
     map: venusTexture,
+    bumpMap: textureLoader.load("./textures/venusbump.jpg"),
+    bumpScale: 0.5,
   }
 )
 const earthMaterial = new THREE.MeshPhongMaterial(
@@ -58,6 +62,8 @@ const earthMaterial = new THREE.MeshPhongMaterial(
 const marsMaterial = new THREE.MeshStandardMaterial(
   {
     map: marsTexture,
+    bumpMap: textureLoader.load("./textures/marsbump1k.jpg"),
+    bumpScale: 0.5,
   }
 )
 const jupiterMaterial = new THREE.MeshStandardMaterial(
@@ -83,6 +89,8 @@ const neptuneMaterial = new THREE.MeshStandardMaterial(
 const moonMaterial = new THREE.MeshStandardMaterial(
   {
     map: moonTexture,
+    bumpMap: textureLoader.load("./textures/moonbump4k.jpg"),
+    bumpScale: 0.5,
   }
 )
 
@@ -90,12 +98,97 @@ const sphereGeometry = new THREE.SphereGeometry(1,32,32);
 const sunMaterial = new THREE.MeshBasicMaterial(
   {
     map: sunTexture,
+    color: 0xffcc33,
   }
 );
 
 const sun = new THREE.Mesh(sphereGeometry,sunMaterial);
 sun.scale.setScalar(5);
 scene.add(sun);
+
+const particlesGeo = new THREE.BufferGeometry();
+const particleCount = 500;
+const positions = [];
+
+for (let i = 0; i < particleCount; i++) {
+  const r = Math.random() * 5 + 2;
+  const theta = Math.random() * 2 * Math.PI;
+  const phi = Math.acos(2 * Math.random() - 1);
+  positions.push(
+    r * Math.sin(phi) * Math.cos(theta),
+    r * Math.sin(phi) * Math.sin(theta),
+    r * Math.cos(phi)
+  );
+}
+
+particlesGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+
+const particlesMat = new THREE.PointsMaterial({
+  color: 0xffaa00,
+  size: 0.1,
+  blending: THREE.AdditiveBlending,
+  transparent: true,
+});
+
+const radiation = new THREE.Points(particlesGeo, particlesMat);
+scene.add(radiation);
+
+// Create geometry
+const windGeo = new THREE.BufferGeometry();
+const velocities = [];
+
+for (let i = 0; i < particleCount; i++) {
+  const theta = Math.random() * 2 * Math.PI;
+  const phi = Math.acos(2 * Math.random() - 1);
+  const r = Math.random() * 0.5;
+
+  const x = r * Math.sin(phi) * Math.cos(theta);
+  const y = r * Math.sin(phi) * Math.sin(theta);
+  const z = r * Math.cos(phi);
+
+  positions.push(x, y, z);
+  velocities.push(x * 0.02, y * 0.02, z * 0.02); // outward velocity
+}
+
+windGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+windGeo.setAttribute('velocity', new THREE.Float32BufferAttribute(velocities, 3));
+
+const windMat = new THREE.PointsMaterial({
+  color: 0xffaa33,
+  size: 0.05,
+  transparent: true,
+  blending: THREE.AdditiveBlending,
+});
+
+const solarWind = new THREE.Points(windGeo, windMat);
+scene.add(solarWind);
+
+function animateSolarWind() {
+  const pos = windGeo.attributes.position;
+  const vel = windGeo.attributes.velocity;
+
+  for (let i = 0; i < pos.count; i++) {
+    pos.array[i * 3] += vel.array[i * 3];
+    pos.array[i * 3 + 1] += vel.array[i * 3 + 1];
+    pos.array[i * 3 + 2] += vel.array[i * 3 + 2];
+
+    const dist = Math.sqrt(
+      pos.array[i * 3] ** 2 +
+      pos.array[i * 3 + 1] ** 2 +
+      pos.array[i * 3 + 2] ** 2
+    );
+
+    if (dist > 10) {
+      pos.array[i * 3] = 0;
+      pos.array[i * 3 + 1] = 0;
+      pos.array[i * 3 + 2] = 0;
+    }
+  }
+
+  pos.needsUpdate = true;
+}
+
+
 
 const planets = [
   {
@@ -328,11 +421,11 @@ const renderloop = () => {
         const moonAngle = elapsedTime * moonData.speed;
         const mx = Math.sin(moonAngle) * moonData.distance;
         const mz = Math.cos(moonAngle) * moonData.distance;
-        moonMesh.position.set(mx,0,mz);
+        // moonMesh.position.set(mx,0,mz);
       }
     })
   })
-
+  animateSolarWind();
   controls.update();
   renderer.render(scene, camera);
   window.requestAnimationFrame(renderloop);
