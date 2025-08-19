@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { Pane } from "tweakpane";
+import { getFresnelMat } from "./getFresnelMat.js";
 
 const pane = new Pane();
 
@@ -226,6 +227,11 @@ if (planet.name === 'Earth' && planet.layers) {
   cloudsMesh.name = 'EarthClouds';
   cloudsMesh.scale.setScalar(1.01);
   planetMesh.add(cloudsMesh);
+
+  const fresnelMat = getFresnelMat();
+  const glowMesh = new THREE.Mesh(sphereGeometry, fresnelMat);
+  glowMesh.scale.setScalar(1.015);
+  planetMesh.add(glowMesh)
 }
 
 // set the scale
@@ -305,10 +311,10 @@ const renderloop = () => {
   planetMeshes.forEach((planet , planetIndex) => {
     const angle = elapsedTime * planets[planetIndex].speed*10;
     const distance = planets[planetIndex].distance;
-    planet.position.x = Math.sin(angle) * distance;
-    planet.position.z = Math.cos(angle) * distance;
+    // planet.position.x = Math.sin(angle) * distance;
+    // planet.position.z = Math.cos(angle) * distance;
 
-    planet.rotation.y += planets[planetIndex].speed;
+    // planet.rotation.y += planets[planetIndex].speed;
 
     if(planets[planetIndex].name === 'Earth'){
       const cloudsMesh = planet.getObjectByName('EarthClouds');
