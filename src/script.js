@@ -106,6 +106,9 @@ ringTexture.center.set(0.5, 0.5);   // Rotate around center
 const saturnRingMaterial = new THREE.MeshStandardMaterial(
   {
     map: ringTexture,
+    transparent: true,
+    opacity : 0.8,
+    blending: THREE.AdditiveBlending,
   }
 );
 const saturnRing = new THREE.Mesh(torusGeometry,saturnRingMaterial);
@@ -453,7 +456,7 @@ const renderloop = () => {
       }
     })
   })
-  saturnRing.rotation.z += 2;
+  saturnRing.rotation.z += 0.5;
   animateSolarWind();
   controls.update();
   renderer.render(scene, camera);
