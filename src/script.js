@@ -37,23 +37,23 @@ scene.background = backgroundCubemap;
 const mercuryMaterial = new THREE.MeshStandardMaterial(
   {
     map: mercuryTexture,
-    bumpMap: textureLoader.load("./textures/mercurybump.jpg"),
+    bumpMap: textureLoader.load("/textures/mercurybump.jpg"),
     bumpScale: 0.5,
   }
 )
 const venusMaterial = new THREE.MeshStandardMaterial(
   {
     map: venusTexture,
-    bumpMap: textureLoader.load("./textures/venusbump.jpg"),
+    bumpMap: textureLoader.load("/textures/venusbump.jpg"),
     bumpScale: 0.5,
   }
 )
 const earthMaterial = new THREE.MeshPhongMaterial(
   {
         map: earthTexture,
-        bumpMap: textureLoader.load("./textures/8081_earthbump10k.jpg"),
+        bumpMap: textureLoader.load("/textures/8081_earthbump10k.jpg"),
         bumpScale: 0.3, 
-        specularMap: textureLoader.load("./textures/8081_earthspec10k.jpg"), // reflectivity
+        specularMap: textureLoader.load("/textures/8081_earthspec10k.jpg"), // reflectivity
         specular: new THREE.Color('grey'), // tweak for intensity
         shininess: 20, // lower = softer highlights, higher = sharper
     
@@ -62,7 +62,7 @@ const earthMaterial = new THREE.MeshPhongMaterial(
 const marsMaterial = new THREE.MeshStandardMaterial(
   {
     map: marsTexture,
-    bumpMap: textureLoader.load("./textures/marsbump1k.jpg"),
+    bumpMap: textureLoader.load("/textures/marsbump1k.jpg"),
     bumpScale: 0.5,
   }
 )
@@ -89,7 +89,7 @@ const neptuneMaterial = new THREE.MeshStandardMaterial(
 const moonMaterial = new THREE.MeshStandardMaterial(
   {
     map: moonTexture,
-    bumpMap: textureLoader.load("./textures/moonbump4k.jpg"),
+    bumpMap: textureLoader.load("/textures/moonbump4k.jpg"),
     bumpScale: 0.5,
   }
 )
@@ -97,7 +97,7 @@ const moonMaterial = new THREE.MeshStandardMaterial(
 const sphereGeometry = new THREE.SphereGeometry(1,32,32);
 const torusGeometry = new THREE.TorusGeometry(1.75 , 0.4 ,2 ,100);
 
-const ringTexture = textureLoader.load("./textures/saturnringpattern.gif");
+const ringTexture = textureLoader.load("/textures/saturnringpattern.gif");
 ringTexture.wrapS = THREE.RepeatWrapping;
 ringTexture.wrapT = THREE.RepeatWrapping;
 ringTexture.rotation = Math.PI / 2; // Rotate 90 degrees
@@ -247,9 +247,9 @@ const planets = [
       }
     ],
     layers:{
-      lightsMap:"./textures/8081_earthlights10k.jpg",
-      cloudsMap: "./textures/8081_earthhiresclouds4K.jpg",
-      cloudsAlpha: "./textures/earthcloudmaptrans.jpg"
+      lightsMap:"/textures/8081_earthlights10k.jpg",
+      cloudsMap: "/textures/8081_earthhiresclouds4K.jpg",
+      cloudsAlpha: "/textures/earthcloudmaptrans.jpg"
     },
 
   },
@@ -435,10 +435,10 @@ const renderloop = () => {
   planetMeshes.forEach((planet , planetIndex) => {
     const angle = elapsedTime * planets[planetIndex].speed*10;
     const distance = planets[planetIndex].distance;
-    // planet.position.x = Math.sin(angle) * distance;
-    // planet.position.z = Math.cos(angle) * distance;
+    planet.position.x = Math.sin(angle) * distance;
+    planet.position.z = Math.cos(angle) * distance;
 
-    // planet.rotation.y += planets[planetIndex].speed;
+    planet.rotation.y += planets[planetIndex].speed;
 
     if(planets[planetIndex].name === 'Earth'){
       const cloudsMesh = planet.getObjectByName('EarthClouds');
@@ -452,7 +452,7 @@ const renderloop = () => {
         const moonAngle = elapsedTime * moonData.speed;
         const mx = Math.sin(moonAngle) * moonData.distance;
         const mz = Math.cos(moonAngle) * moonData.distance;
-        // moonMesh.position.set(mx,0,mz);
+        moonMesh.position.set(mx,0,mz);
       }
     })
   })
